@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Analysis System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0; 
+            height: 100vh;  
+            width: 100vw; 
+            background-image: url('att1.png'); /* Add your image URL */
+            background-size: 10% 10%;
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 50px;
+            text-align: center;
+            color: white;
+        }
+
+        h1 {
+            font-size: 50px;
+            font-family: 'Georgia', serif;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 20px;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: black;
+        }
+
+        input[type="text"], input[type="password"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .average {
+            font-size: 20px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #thank-you-page .thank-you-message {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        #thank-you-page .details,
+        #thank-you-page .attendance {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Welcome Page -->
+    <div id="welcome-page">
+        <header>
+            <h1>Welcome to Attendance Analysis System</h1>
+            <p>Track your subject attendance with ease.</p>
+            <button class="btn" onclick="showLoginPage()">Go to Login</button>
+        </header>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="hidden">
+        <div class="container">
+            <h2>Login to Attendance Analysis System</h2>
+            <form id="login-form">
+                <input type="text" id="name" placeholder="Name" required>
+                <input type="text" id="class" placeholder="Class" required>
+                <input type="text" id="register-no" placeholder="Register No" required>
+                <input type="text" id="college-name" placeholder="College Name" required>
+                <button type="button" class="btn" onclick="showStudentLogin()">Student Login</button><br>
+                <button type="button" class="btn" onclick="showWelcomePage()">Back to Home</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Login Page -->
+    <div id="student-login-page" class="hidden">
+        <div class="container">
+            <h2>Enter Attendance Details</h2>
+            <form id="attendance-form">
+                <table id="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Total Days</th>
+                            <th>Present Days</th>
+                            <th>Attendance Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" name="subject1" placeholder="Subject 1"></td>
+                            <td><input type="number" name="total_days1" placeholder="Total Days"></td>
+                            <td><input type="number" name="present_days1" placeholder="Present Days"></td>
+                            <td><input type="text" name="percent1" readonly></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type="button" class="btn" onclick="addRow()">Add Row</button>
+                <button type="button" class="btn" onclick="submitAttendance()">Submit</button><br>
+                <button type="button" class="btn" onclick="showLoginPage()">Back to Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Thank You Page -->
+    <div id="thank-you-page" class="hidden">
+        <div class="container">
+            <div class="thank-you-message">Thank you for visiting our site, <span id="thank-you-name"></span>!</div>
+            <div class="details">
+                <h3>Student Details:</h3>
+                <p>Name: <span id="student-name-thank-you"></span></p>
+                <p>Class: <span id="student-class-thank-you"></span></p>
+                <p>Register No: <span id="student-register-no-thank-you"></span></p>
+                <p>College Name: <span id="student-college-name-thank-you"></span></p>
+            </div>
+            <div class="attendance">
+                <h3>Attendance Details:</h3>
+                <p>Total Average Attendance: <span id="total-average-percentage-thank-you"></span></p>
+            </div>
+            <button class="btn" onclick="showWelcomePage()">Go Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        let studentData = {};
+        let subjectPercentages = [];
+
+        // Show the welcome page
+        function showWelcomePage() {
+            document.getElementById('thank-you-page').classList.add('hidden');
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('student-login-page').classList.add('hidden');
+            document.getElementById('welcome-page').classList.remove('hidden');
+        }
+
+        // Show login page
+        function showLoginPage() {
+            document.getElementById('welcome-page').classList.add('hidden');
+            document.getElementById('login-page').classList.remove('hidden');
+        }
+
+        // Show student login page and store student info
+        function showStudentLogin() {
+            studentData.name = document.getElementById('name').value;
+            studentData.class = document.getElementById('class').value;
+            studentData.registerNo = document.getElementById('register-no').value;
+            studentData.collegeName = document.getElementById('college-name').value;
+
+            // Check if all fields are filled
+            if (studentData.name && studentData.class && studentData.registerNo && studentData.collegeName) {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('student-login-page').classList.remove('hidden');
+            } else {
+                alert("Please fill in all fields before proceeding.");
+            }
+        }
+
+        // Add a new row for subjects
+        function addRow() {
+            const table = document.getElementById("attendance-table").getElementsByTagName('tbody')[0];
+            const row = document.createElement("tr");
+
+            row.innerHTML = ` 
+                <td><input type="text" name="subject" placeholder="Subject"></td>
+                <td><input type="number" name="total_days" placeholder="Total Days"></td>
+                <td><input type="number" name="present_days" placeholder="Present Days"></td>
+                <td><input type="text" name="percent" readonly></td>
+            `;
+            table.appendChild(row);
+        }
+
+        // Handle form submission and calculate attendance percentage
+        function submitAttendance() {
+            let totalPercent = 0;
+            let count = 0;
+            let totalSubjects = 0;
+
+            const rows = document.querySelectorAll("#attendance-table tbody tr");
+
+            rows.forEach(row => {
+                const subject = row.querySelector("input[name^='subject']").value;
+                const totalDays = row.querySelector("input[name^='total_days']").value;
+                const presentDays = row.querySelector("input[name^='present_days']").value;
+                const percentField = row.querySelector("input[name^='percent']");
+
+                if (totalDays && presentDays) {
+                    const percent = (presentDays / totalDays) * 100;
+                    percentField.value = percent.toFixed(2) + "%"; // Display the percentage for each subject
+                    subjectPercentages.push(percent);
+                    totalPercent += percent;
+                    count++;
+                    totalSubjects++;
+                }
+            });
+
+            const totalAverage = totalPercent / totalSubjects;
+            document.getElementById("total-average-percentage-thank-you").innerText = totalAverage.toFixed(2) + "%";
+
+            // Show Thank You page
+            document.getElementById('student-login-page').classList.add('hidden');
+            document.getElementById('thank-you-page').classList.remove('hidden');
+
+            document.getElementById('thank-you-name').innerText = studentData.name;
+            document.getElementById('student-name-thank-you').innerText = studentData.name;
+            document.getElementById('student-class-thank-you').innerText = studentData.class;
+            document.getElementById('student-register-no-thank-you').innerText = studentData.registerNo;
+            document.getElementById('student-college-name-thank-you').innerText = studentData.collegeName;
+        }
+    </script>
+
+</body>
+</html>
